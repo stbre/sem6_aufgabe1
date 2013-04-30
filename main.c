@@ -111,6 +111,8 @@ listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t 
  */
 void list_free_element(listNode_t* elem);
 
+
+
 /**
  * @brief insert element before another one
  * 
