@@ -235,6 +235,7 @@ int main (int argc, char** argv)
 					operands_b[counter] = operand_b;
 					fprintf(out_file_hdl,"%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
 					printf("%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
+
 //					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));
 					if(EXIT_FAILURE == ret)
 					{
