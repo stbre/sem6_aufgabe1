@@ -28,6 +28,7 @@
 #include <Windows.h>
 #include "stopwatch.h"
 
+
 static const char* in_filename = "foobar.txt";
 static const char* out_filename = "result.txt";
 
@@ -110,7 +111,6 @@ listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t 
  * @param elem [in] Pointer to a list node
  */
 void list_free_element(listNode_t* elem);
-
 
 
 /**
