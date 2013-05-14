@@ -49,12 +49,20 @@ Hello World unter Versionsverwaltung stellen:
     
 ### Wiederherstellen der Datei:
 
-   $ git checkout HelloWorld.c
+    $ git checkout HelloWorld.c
 
 ### Anzeige git log
 
-   $ git log
+    $ git log
 
 ### Anzeige des Logs einer Datei:
 
-   $ git log README.md
+    $ git log README.md
+
+### Verwendung von WinMerge als Diff-Tool
+Das Tool WinMerge in einer Portable Variante kann hier bezogen werden: [portableapps](http://portableapps.com/de/apps/utilities/winmerge_portable) 
+An der DHBW kann das Tool z.B. unter M:\ installiert werden. Anschließend sind in der git Konsole die folgenden Befehle auszuführen.
+
+    $ git config --global diff.tool winmerge
+	$ git config --replace --global difftool.winmerge.cmd "\"M:\tools\WinMergePortable\WinMergePortable.exe\" -e -u -dl \"Base\" -dr \"Mine\" \$REMOTE \$LOCAL"
+	$ git config --global difftool.prompt false
