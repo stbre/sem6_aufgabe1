@@ -236,7 +236,7 @@ int main (int argc, char** argv)
 					fprintf(out_file_hdl,"%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
 					printf("%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
 
-//					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));
+//					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));		
 					if(EXIT_FAILURE == ret)
 					{
 						break;
@@ -282,4 +282,119 @@ void calculate_statistics(statistics_t * stat,uint32_t operand_a,uint32_t operan
 		stat->avg_operand_a = stat->sum_operand_a/stat->counter;
 		stat->avg_operand_b = stat->sum_operand_b/stat->counter;
 	}
+}
+
+listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t result)
+{
+	listNode_t *temp = NULL;
+	temp = (listNode_t*) malloc(sizeof(listNode_t));	//Speicher für listNode allokieren
+	if(NULL != temp)
+	{
+		temp->operand_a = operand_a;
+		temp->operand_b = operand_b;
+		temp->result = result;
+		temp->pNext = NULL;
+		temp->pPrev = NULL;
+	}
+	return temp;
+}
+
+void list_free_element(listNode_t* elem)	//Element freigeben(Speicher freigeben)
+{
+	if(NULL != elem)
+	{
+	free((void*) elem);
+	elem = NULL;	//Setzt den Pointer auf NULL
+	}
+}
+
+int list_insert_before(doubleLinkedList_t *list , listNode_t* old ,listNode_t* elem)
+{
+	int ret = EXIT_FAILURE;
+
+	if(NULL != elem)
+	{
+		if(old != list->headOfList)
+		{
+			elem->pNext = old;	//Neues Element mit pNext auf auf altes Element zeigen lassen
+			elem->pPrev = old->pPrev;	//Neues Element mit pPrev auf vorheriges aktuelles Element zeigen lassen
+			old->pPrev = elem;	//Aktuelles Elemen mit pPrev auf neues Element zeigen lassen
+			old->pPrev->pNext = elem;		//Vorheriges altes Element mit pNext auf neues Element zeigen lassen
+			
+			ret = EXIT_SUCCESS;
+		}
+		else
+		{
+			elem->pNext = old;	//Neues Element mit pNext auf auf altes Element zeigen lassen
+			elem->pPrev = NULL;	//Neues Element mit pPrev auf vorheriges aktuelles Element zeigen lassen
+			old->pPrev = elem;	//Aktuelles Elemen mit pPrev auf neues Element zeigen lassen
+			list->headOfList = elem;
+			
+			ret = EXIT_SUCCESS;
+		}
+	}
+	return ret;
+}
+
+int list_insert_after(doubleLinkedList_t *list , listNode_t* old ,listNode_t* elem)
+{
+	int ret = EXIT_FAILURE;
+
+	if(NULL != elem)
+	{
+		if(old != list->tailOfList)
+		{
+			elem->pNext = old->pNext;	//Neues Element mit pNext auf auf nächstes altes Element zeigen lassen
+			elem->pPrev = old;	//Neues Element mit pPrev auf aktuelles Element zeigen lassen
+			old->pNext = elem;	//Aktuelles Elemen mit pNext auf neues Element zeigen lassen
+			old->pNext->pPrev = elem;		//Nächstes altes Element mit pPrev auf neues Element zeigen lassen
+			
+			ret = EXIT_SUCCESS;
+		}
+		else
+		{
+			elem->pNext = NULL;	//Neues Element mit pNext auf auf nächstes altes Element zeigen lassen
+			elem->pPrev = old;	//Neues Element mit pPrev auf aktuelles Element zeigen lassen
+			old->pNext = elem;	//Aktuelles Elemen mit pNext auf neues Element zeigen lassen
+			list->tailOfList = elem;
+			
+			ret = EXIT_SUCCESS;
+		}
+	}
+
+	return ret;
+}
+
+int list_push_front(doubleLinkedList_t *list , listNode_t* elem)
+{
+	int ret = EXIT_FAILURE;
+
+	if(NULL != elem)
+	{
+		elem->pNext = list->headOfList;
+		elem->pPrev = NULL;
+		list->headOfList->pPrev = elem;
+		list->headOfList = elem;
+		
+		ret = EXIT_SUCCESS;
+	}
+
+	return ret;
+}
+
+int list_push_back(doubleLinkedList_t *list, listNode_t* elem)
+{
+	int ret = EXIT_FAILURE;
+
+	if(NULL != elem)
+	{
+		elem->pNext = NULL;
+		elem->pPrev = list->tailOfList;
+		list->tailOfList->pNext = elem;
+		list->tailOfList = elem;
+
+		ret = EXIT_SUCCESS;
+	}
+
+	return ret;
 }
