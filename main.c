@@ -101,7 +101,7 @@ void calculate_statistics(statistics_t * stat,uint32_t operand_a,uint32_t operan
  * @param [in] operand_a The operand a for the MAC operation
  * @param [in] operand_b The operand b for the MAC operation
  * @param [in] result The result of the MAC operation
- * @result he new element or NULL in case of error
+ * @result the new element or NULL in case of error
  */
 listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t result);
 
@@ -168,7 +168,7 @@ int main (int argc, char** argv)
 	int32_t ret = EXIT_SUCCESS;
 	FILE * in_file_hdl = NULL;
 	FILE * out_file_hdl = NULL;
-	listNode_t *curr = result_list.headOfList;
+//	listNode_t *curr = result_list.headOfList;
 	int idx = 0;
 
 	statistics_t stat;
@@ -236,7 +236,7 @@ int main (int argc, char** argv)
 					operands_b[counter] = operand_b;
 					fprintf(out_file_hdl,"%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
 					printf("%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
-					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));
+//					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));
 					if(EXIT_FAILURE == ret)
 					{
 						break;
@@ -281,5 +281,29 @@ void calculate_statistics(statistics_t * stat,uint32_t operand_a,uint32_t operan
 		stat->counter++;
 		stat->avg_operand_a = stat->sum_operand_a/stat->counter;
 		stat->avg_operand_b = stat->sum_operand_b/stat->counter;
+	}
+}
+
+listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t result)
+{
+	listNode_t *temp = NULL; 
+	temp = (listNode_t*) malloc(sizeof(listNode_t));
+	if ( NULL != temp )
+	{
+		temp->operand_a = operand_a;
+		temp->operand_b = operand_b;
+		temp->result = result;
+		temp->pNext = NULL;
+		temp->pPrev = NULL;
+	}
+	return temp;
+}
+
+void list_free_element(listNode_t* elem)
+{
+	if(NULL != elem )
+	{
+		free((void*) elem);
+		elem = NULL;
 	}
 }
