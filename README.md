@@ -70,6 +70,7 @@ An der DHBW kann das Tool z.B. unter M:\ installiert werden. Anschließend sind 
 
 Durchsprache der Lösung
 =======================
+Informationen zu remotes [git book](http://git-scm.com/book/en/Git-Basics-Working-with-Remotes)
 
 ### Hinzufügen eines entfernten Repositories
 Sie können das Repository mit der Lösung wie folgt hinzufügen
