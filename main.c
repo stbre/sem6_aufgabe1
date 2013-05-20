@@ -28,7 +28,6 @@
 #include <Windows.h>
 #include "stopwatch.h"
 
-
 static const char* in_filename = "foobar.txt";
 static const char* out_filename = "result.txt";
 
@@ -101,7 +100,7 @@ void calculate_statistics(statistics_t * stat,uint32_t operand_a,uint32_t operan
  * @param [in] operand_a The operand a for the MAC operation
  * @param [in] operand_b The operand b for the MAC operation
  * @param [in] result The result of the MAC operation
- * @result the new element or NULL in case of error
+ * @result he new element or NULL in case of error
  */
 listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t result);
 
@@ -111,7 +110,6 @@ listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t 
  * @param elem [in] Pointer to a list node
  */
 void list_free_element(listNode_t* elem);
-
 
 /**
  * @brief insert element before another one
@@ -163,12 +161,25 @@ int list_push_back(doubleLinkedList_t *list, listNode_t* elem);
  */
 uint64_t do_mac_operation(int32_t operand_a,uint32_t operand_b,uint64_t prev_result);
 
+/**
+ * @brief initilaize the memory pool 
+ * 
+ * @param pool [inout] pool to be initialized 
+ * @param size [in] size of pool
+ * @return EXIT_SUCCESS on success
+ */ 
+uint32_t init_list_node_mem_pool(listNodeMem_t *pool, uint32_t size);
+
+
+static doubleLinkedList_t result_list = {0}; /* initilize to zero */
+
+
 int main (int argc, char** argv)
 {
 	int32_t ret = EXIT_SUCCESS;
 	FILE * in_file_hdl = NULL;
 	FILE * out_file_hdl = NULL;
-//	listNode_t *curr = result_list.headOfList;
+	listNode_t *curr = result_list.headOfList;
 	int idx = 0;
 
 	statistics_t stat;
@@ -236,12 +247,13 @@ int main (int argc, char** argv)
 					operands_b[counter] = operand_b;
 					fprintf(out_file_hdl,"%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
 					printf("%llu = %llu + (%d * %d)\n",result[counter],prev_result,operand_a, operand_b);
-//					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));
+					ret = list_push_back(&result_list,list_get_new_element(operand_a,operand_b,result[counter]));
 					if(EXIT_FAILURE == ret)
 					{
 						break;
 					}
 					prev_result =  result[counter];
+					calculate_statistics(&stat,operand_a,operand_b);
 					counter++;
 				}
 			}
@@ -258,12 +270,170 @@ int main (int argc, char** argv)
 	{
 		fclose(out_file_hdl);
 	}
+
+	curr = result_list.headOfList;
+
+	while ( NULL != curr )
+	{
+		if(result[idx] != curr->result)
+		{
+			printf("error in list result[%d](%ul) != curr->result(%ul)\n",idx,result[idx],curr->result);
+		}
+		else
+		{
+			printf("success!!!\n");
+		}
+		curr = curr->pNext;
+		idx++;
+	}
+
+
+	if(NULL != result_list.headOfList )
+	{
+
+		while(result_list.headOfList->pNext != NULL)
+		{
+			result_list.headOfList = result_list.headOfList->pNext;
+			list_free_element(result_list.headOfList->pPrev);
+			result_list.headOfList->pPrev = NULL;
+		}
+		list_free_element(result_list.headOfList);
+	}
 	return ret;
 }
 
 uint64_t do_mac_operation(int32_t operand_a,uint32_t operand_b,uint64_t result)
 {
 	return result + (operand_a * operand_b);
+}
+
+
+
+listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t result)
+{
+	listNode_t* ret = NULL;
+	int i = 0;
+#ifndef STATIC_MEM
+	 ret = (listNode_t*)malloc(sizeof(listNode_t));
+#else
+	for (i = 0; i < MEM_POOL_SIZE; i++)
+	{
+		if(FALSE == list_node_mem_pool[i].inUse )
+		{
+			list_node_mem_pool[i].inUse = TRUE;
+			ret = &(list_node_mem_pool[i].node);
+			break;
+		}
+	}
+#endif
+	if(NULL != ret )
+	{
+		ret->operand_a = operand_a;
+		ret->operand_b = operand_b;
+		ret->result = result;
+		ret->pPrev = NULL;
+		ret->pNext = NULL;
+	}
+	return ret;
+}
+
+int list_push_back(doubleLinkedList_t *list, listNode_t* elem)
+{
+	if ( NULL == elem )
+	{
+		return EXIT_FAILURE;
+	}
+	if(NULL == list->tailOfList)
+	{
+		return list_push_front(list,elem);
+	}
+	else
+	{
+		return list_insert_after(list, list->tailOfList, elem);
+	}
+}
+
+int list_push_front(doubleLinkedList_t *list , listNode_t* elem)
+{
+	if(NULL == elem )
+	{
+		return EXIT_FAILURE;
+	}
+	if ( NULL == list->headOfList )
+	{
+         list->headOfList = elem;
+         list->tailOfList  = elem;
+         elem->pPrev = NULL;
+         elem->pNext = NULL;
+		 return EXIT_SUCCESS;
+	}
+	else
+	{
+         return  list_insert_before(list, list->headOfList, elem);
+	}
+}
+
+int list_insert_after(doubleLinkedList_t *list , listNode_t* old ,listNode_t* elem)
+{
+	elem->pPrev = old;
+	elem->pNext = old->pNext;
+
+	if(( NULL == old ) ||  (NULL == elem ) )
+	{
+		return EXIT_FAILURE;
+	}
+    if( NULL ==  old->pNext )
+	{
+         list->tailOfList = elem;
+	}
+    else
+	{
+		old->pNext->pPrev = elem; /* already checked for NULL !*/
+	}
+	old->pNext = elem;
+
+	return EXIT_SUCCESS;
+}
+
+int list_insert_before(doubleLinkedList_t *list , listNode_t* old ,listNode_t* elem)
+{
+	int ret = EXIT_FAILURE;
+
+	elem->pPrev = old->pPrev;
+	elem->pNext = old;
+
+	if(( NULL == old ) ||  (NULL == elem ) )
+	{
+		return EXIT_FAILURE;
+	}
+	if( NULL == old->pPrev )
+	{
+         list->headOfList = elem;
+	}
+    else
+	{
+         old->pPrev->pNext = elem; /* already checked for NULL */
+	}
+	old->pPrev  = elem;
+
+	return ret;
+}
+
+void list_free_element(const listNode_t* elem)
+{
+	int i = 0;
+#ifndef STATIC_MEM
+	if( NULL != elem )
+		free(elem);
+#else
+	for(i = 0; i < MEM_POOL_SIZE; i++ )
+	{
+		if(elem == &(list_node_mem_pool[i].node))
+		{
+			list_node_mem_pool[i].inUse = FALSE;
+		}
+	}
+#endif
 }
 
 
@@ -284,26 +454,19 @@ void calculate_statistics(statistics_t * stat,uint32_t operand_a,uint32_t operan
 	}
 }
 
-listNode_t* list_get_new_element(uint32_t operand_a,uint32_t operand_b,uint64_t result)
+uint32_t init_list_node_mem_pool(listNodeMem_t *pool, uint32_t size)
 {
-	listNode_t *temp = NULL; 
-	temp = (listNode_t*) malloc(sizeof(listNode_t));
-	if ( NULL != temp )
+	int i = 0;
+	if(NULL == pool)
 	{
-		temp->operand_a = operand_a;
-		temp->operand_b = operand_b;
-		temp->result = result;
-		temp->pNext = NULL;
-		temp->pPrev = NULL;
+		return EXIT_FAILURE;
 	}
-	return temp;
-}
-
-void list_free_element(listNode_t* elem)
-{
-	if(NULL != elem )
+	else
 	{
-		free((void*) elem);
-		elem = NULL;
+		for(i = 0; i< size; i++)
+		{
+			pool[i].inUse = FALSE;
+		}
+		return EXIT_SUCCESS;
 	}
 }
