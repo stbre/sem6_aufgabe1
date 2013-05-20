@@ -13,7 +13,7 @@ Erstellen Sie einen neuen Branch mit dem Namen "loesung_2"
 Aufteilung
 ----------
 
-Teilen Sie die main.c aus Aufgabe I in drei Teile. Erstellen Sie für jeden Zwischenschritt einen commit durch.
+Teilen Sie die main.c aus Aufgabe I in drei Teile. Erstellen Sie für jeden Zwischenschritt einen eigenen commit.
 
  - In eine Datei main.c  mit der main-Funktion
  - In eine Datei dl_list.h mit den Deklarationen der Funktionen
