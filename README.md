@@ -64,5 +64,31 @@ Das Tool WinMerge in einer Portable Variante kann hier bezogen werden: [portable
 An der DHBW kann das Tool z.B. unter M:\ installiert werden. Anschließend sind in der git Konsole die folgenden Befehle auszuführen.
 
     $ git config --global diff.tool winmerge
-	$ git config --replace --global difftool.winmerge.cmd "\"M:\tools\WinMergePortable\WinMergePortable.exe\" -e -u -dl \"Base\" -dr \"Mine\" \$REMOTE \$LOCAL"
-	$ git config --global difftool.prompt false
+    $ git config --replace --global difftool.winmerge.cmd "\"M:\tools\WinMergePortable\WinMergePortable.exe\" -e -u -dl \"Base\" -dr \"Mine\" \$REMOTE \$LOCAL"
+    $ git config --global difftool.prompt false
+
+
+Durchsprache der Lösung
+=======================
+
+### Hinzufügen eines entfernten Repositories
+Sie können das Repository mit der Lösung wie folgt hinzufügen
+
+    $ git remote add loesung https://github.com/dhbw-fn-micro/loesung_1.git
+    $ git fetch --all
+    $ git remote 
+    $ git remote -v
+    $ git branch
+    $ git branch -a
+    
+### Vergleichen der Lösung
+Sie können die Lösung mit Ihrem Code wie folgt vergleichen
+
+    $ git difftool   master..loesung/solution
+
+### Mergen der der Lösung
+Sie können die Lösung mit Ihrem Code wie folgt zusammenführen
+
+    $ git merge loesung/solution 
+
+
