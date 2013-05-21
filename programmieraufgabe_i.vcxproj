@@ -76,13 +76,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dl_list.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="stopwatch.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Aufgabe_2.md" />
     <None Include="foobar.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dl_list.h" />
     <ClInclude Include="stopwatch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
